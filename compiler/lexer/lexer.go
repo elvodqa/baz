@@ -20,6 +20,7 @@ const (
 	NE       = "NE"    // !=
 	ASSIGN   = "ASSIGN"
 	COMMA    = "COMMA" // ,
+	DOT      = "DOT"   // .
 	SEMI     = "SEMI"  // ;
 	LPAREN   = "LPAREN"
 	RPAREN   = "RPAREN"
@@ -93,8 +94,8 @@ func (l *Lexer) NextToken() Token {
 		tok = newToken(SEMI, l.ch)
 	case '?':
 		tok = newToken(QUESTION, l.ch)
-
-	// GT, GE, EQ, NE, LT, LE
+	case '.':
+		tok = newToken(DOT, l.ch)
 	case '>':
 		if l.peekChar() == '=' {
 			ch := l.ch

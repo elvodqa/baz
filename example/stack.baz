@@ -1,0 +1,14 @@
+
+class Person {
+	init(name, age) {
+		@name = name
+		@age = age
+	}
+
+	sayHello() {
+		print("Hello, my name is " + @name + " and I am " + @age + " years old.")
+	}
+}
+
+person = Person.new("John", 42)
+person.sayHello()
