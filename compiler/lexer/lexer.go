@@ -1,7 +1,8 @@
 package lexer
 
 const (
-	IDENT = "IDENT"
+	IDENT      = "IDENT"
+	INST_IDENT = "INST_IDENT"
 
 	EOF      = "EOF"
 	NUMBER   = "NUMBER"
@@ -28,6 +29,12 @@ const (
 	RBRACE   = "RBRACE"
 	LBRACKET = "LBRACKET"
 	RBRACKET = "RBRACKET"
+	AT       = "AT"
+
+	NEWLINE    = "NEWLINE"
+	WHITESPACE = "WHITESPACE"
+	TAB        = "TAB"
+	CR         = "CR"
 
 	// Keywords
 )
@@ -65,9 +72,15 @@ func (l *Lexer) readChar() {
 func (l *Lexer) NextToken() Token {
 	var tok Token
 
-	l.skipWhitespace()
-
 	switch l.ch {
+	case '\n':
+		tok = newToken(NEWLINE, 'n')
+	case '\t':
+		tok = newToken(TAB, l.ch)
+	case '\r':
+		tok = newToken(CR, l.ch)
+	case ' ':
+		tok = newToken(WHITESPACE, l.ch)
 	case '+':
 		tok = newToken(PLUS, l.ch)
 	case '-':
@@ -128,6 +141,15 @@ func (l *Lexer) NextToken() Token {
 		} else {
 			tok = newToken(BANG, l.ch)
 		}
+	case '@':
+		if isLetter(l.peekChar()) {
+			l.readChar()
+			tok.Value = l.readIdentifier()
+			tok.Type = INST_IDENT
+			return tok
+		} else {
+			tok = newToken(AT, l.ch)
+		}
 	case 0:
 		tok.Value = ""
 		tok.Type = EOF
@@ -138,6 +160,7 @@ func (l *Lexer) NextToken() Token {
 		if isLetter(l.ch) {
 			tok.Value = l.readIdentifier()
 			tok.Type = IDENT
+			return tok
 		} else if isDigit(l.ch) {
 			tok.Value = l.readNumber()
 			tok.Type = NUMBER
@@ -160,6 +183,12 @@ func (l *Lexer) readNumber() string {
 	position := l.position
 	for isDigit(l.ch) {
 		l.readChar()
+	}
+	if l.ch == '.' {
+		l.readChar()
+		for isDigit(l.ch) {
+			l.readChar()
+		}
 	}
 	return l.input[position:l.position]
 }
@@ -185,10 +214,4 @@ func (l *Lexer) readString() string {
 
 func newToken(tokenType string, ch byte) Token {
 	return Token{Type: tokenType, Value: string(ch)}
-}
-
-func (l *Lexer) skipWhitespace() {
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
-		l.readChar()
-	}
 }

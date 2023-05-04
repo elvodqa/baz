@@ -28,12 +28,17 @@ func main() {
 	switch ReplMode {
 	case "lexer":
 		fmt.Println("Lexer REPL mode")
+
 		reader := bufio.NewReader(os.Stdin)
 		for {
 			fmt.Print(">> ")
 			text, _ := reader.ReadString('\n')
 			if text == "##exit\n" || text == "##quit\n" {
 				return
+			}
+			if text == "##clear\n" {
+				fmt.Print("\033[H\033[2J")
+				continue
 			}
 			l := lexer.NewLexer(text)
 			for tok := l.NextToken(); tok.Type != lexer.EOF; tok = l.NextToken() {
