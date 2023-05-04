@@ -164,6 +164,7 @@ func (l *Lexer) NextToken() Token {
 		} else if isDigit(l.ch) {
 			tok.Value = l.readNumber()
 			tok.Type = NUMBER
+			return tok
 		}
 	}
 
