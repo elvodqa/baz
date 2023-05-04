@@ -27,6 +27,7 @@ func init() {
 func main() {
 	switch ReplMode {
 	case "lexer":
+		whitespace_visible := false
 		fmt.Println("Lexer REPL mode")
 
 		reader := bufio.NewReader(os.Stdin)
@@ -40,9 +41,20 @@ func main() {
 				fmt.Print("\033[H\033[2J")
 				continue
 			}
+			if text == "##ws\n" {
+				whitespace_visible = !whitespace_visible
+				fmt.Printf("Whitespace visible: %t\n", whitespace_visible)
+				continue
+			}
 			l := lexer.NewLexer(text)
 			for tok := l.NextToken(); tok.Type != lexer.EOF; tok = l.NextToken() {
-				fmt.Printf("%+v\n", tok)
+				if whitespace_visible {
+					fmt.Printf("%+v\n", tok)
+				} else {
+					if tok.Type != "WHITESPACE" {
+						fmt.Printf("%+v\n", tok)
+					}
+				}
 			}
 		}
 	case "parser":
