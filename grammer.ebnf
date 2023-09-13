@@ -1,0 +1,47 @@
+start: statement+
+
+statement: "function" id paren_expr "{" statement* "}" -> function_decl
+        | "if" paren_expr statement -> if_expr 
+        | "if" paren_expr statement "else" statement -> if_else_expr
+        | "while" paren_expr statement  -> while_expr
+        | "{" statement* "}" -> block
+        | expr ";" -> expr_stmt
+        | ";" -> empty_stmt
+        | "return" expr -> return_expr
+
+paren_expr: "(" expr ("," expr)* ")" -> paren_expr
+          | "(" ")"
+
+expr: id "=" expr -> assign_expr
+    | term
+    | term "+" term -> add_expr
+    | term "-" term -> sub_expr
+    | term "*" term -> mul_expr
+    | term "/" term -> div_expr
+    | term "%" term -> mod_expr
+    | term "==" term -> eq_expr
+    | term "!=" term -> neq_expr
+    | term "<" term -> lt_expr
+    
+
+term: STRING
+    | NUMBER
+    | paren_expr
+    | id
+    | id "(" ")"
+    | id "(" expr ("," expr)* ")"
+    | id "[" expr "]"
+    | id "." id
+    | id "++"
+    | id "--"
+
+id: /[a-zA-Z_][a-zA-Z0-9_]*/
+string: STRING
+integer: INT
+INT: NUMBER
+
+
+%import common.INT -> NUMBER
+%import common.ESCAPED_STRING -> STRING
+%import common.WS
+%ignore WS
